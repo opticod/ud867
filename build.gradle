@@ -17,3 +17,29 @@ allprojects {
         jcenter()
     }
 }
+
+
+
+task functionalTest {
+    dependsOn 'startServer', 'executeTests', 'stopServer'
+    evaluationDependsOn ':backend'
+    project(':backend') {
+        appengine {
+            daemon true
+        }
+    }
+}
+
+task startServer {
+    dependsOn ':backend:appengineRun'
+}
+
+task executeTests {
+    dependsOn 'startServer', ':app:connectedAndroidTest'
+    mustRunAfter('startServer')
+}
+
+task stopServer {
+    dependsOn 'executeTests', ':backend:appengineStop'
+    mustRunAfter('executeTests')
+}
