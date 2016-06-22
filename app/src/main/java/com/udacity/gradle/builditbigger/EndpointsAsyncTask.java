@@ -1,8 +1,10 @@
 package com.udacity.gradle.builditbigger;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.util.Pair;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -17,12 +19,14 @@ import www.anupam.jokedisplayer.JokeActivity;
 /**
  * Created by anupam on 21/6/16.
  */
-class EndpointsAsyncTask extends AsyncTask<Context, Void, String> {
+class EndpointsAsyncTask extends AsyncTask<Pair<Context, ProgressDialog>, Void, String> {
+
     private static JokesAPI myApiService = null;
     private Context context;
+    private ProgressDialog progressDialog;
 
     @Override
-    protected String doInBackground(Context... params) {
+    protected String doInBackground(Pair<Context, ProgressDialog>... params) {
         if (myApiService == null) {  // Only do this once
             JokesAPI.Builder builder = new JokesAPI.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
@@ -41,7 +45,8 @@ class EndpointsAsyncTask extends AsyncTask<Context, Void, String> {
             myApiService = builder.build();
         }
 
-        context = params[0];
+        context = params[0].first;
+        progressDialog = params[0].second;
 
         try {
             return myApiService.getRandomJoke().execute().getData();
@@ -53,6 +58,7 @@ class EndpointsAsyncTask extends AsyncTask<Context, Void, String> {
     @Override
     protected void onPostExecute(String result) {
 
+        progressDialog.dismiss();
         Intent intent = new Intent(context, JokeActivity.class);
         intent.putExtra(Intent.EXTRA_TEXT, result);
         context.startActivity(intent);

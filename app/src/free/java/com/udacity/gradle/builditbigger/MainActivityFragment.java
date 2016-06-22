@@ -1,7 +1,10 @@
 package com.udacity.gradle.builditbigger;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,7 +66,7 @@ public class MainActivityFragment extends Fragment {
 
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("SEE_YOUR_LOGCAT_TO_GET_YOUR_DEVICE_ID")
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
 
         mInterstitialAd.loadAd(adRequest);
@@ -75,6 +78,9 @@ public class MainActivityFragment extends Fragment {
         Intent intent = new Intent(this, JokeActivity.class);
         intent.putExtra(Intent.EXTRA_TEXT, joke);
         startActivity(intent);*/
-        new EndpointsAsyncTask().execute(getContext());
+        ProgressDialog progress = new ProgressDialog(getActivity());
+        progress.setCancelable(false);
+        progress.show();
+        new EndpointsAsyncTask().execute(new Pair<Context,ProgressDialog>(getContext(),progress));
     }
 }
